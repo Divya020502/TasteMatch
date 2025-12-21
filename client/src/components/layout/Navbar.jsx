@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import "./navbar.css";
+import "../../styles/Navbar.css";
 
 const Navbar = () => {
   // ✅ FIX: extract user ALSO
