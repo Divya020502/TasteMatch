@@ -8,8 +8,8 @@ import PrivateRoute from "../components/common/PrivateRoute";
 import TasteQuiz from "../pages/tastes/TasteQuiz";
 import Explore from "../pages/dashboard/Explore";
 import DishManagement from "../pages/admin/DishManagement";
-import EditDish from "../pages/Admin/EditDish";
-import AddDish from "../pages/Admin/AddDish";
+import EditDish from "../pages/admin/EditDish";
+import AddDish from "../pages/admin/AddDish";
 import MapView from "../pages/dashboard/MapView";
 
 
