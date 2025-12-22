@@ -1,60 +1,29 @@
-.map-container {
-  margin-top: 20px;
+.map-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
 }
 
-.map-subtitle {
-  color: var(--muted);
+.map-title {
+  width: 100%;
+  max-width: 1200px;
   margin-bottom: 12px;
 }
 
-.map-wrapper {
-  height: 70vh;
+.map-container {
+  width: 500px;
+  height: 700px;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: hidden; /* 🔥 critical */
+  background: #eaeaea;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-.leaflet-map {
-  height: 100%;
-  width: 100%;
-}
-
-/* Ensure Leaflet map renders properly */
-.leaflet-container {
-  height: 100% !important;
-  width: 100% !important;
-  z-index: 1;
-}
-
-.leaflet-tile-pane {
-  z-index: 2;
-}
-
-.leaflet-marker-pane {
-  z-index: 3;
-}
-
-.leaflet-popup-pane {
-  z-index: 4;
-}
-
-.leaflet-control-container {
-  z-index: 5;
-}
-
-.map-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 60vh;
-  color: var(--muted);
-}
-
-.directions-btn {
-  display: inline-block;
-  padding: 8px 12px;
-  background-color: #2563eb;
-  color: #fff;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 600;
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .map-container {
+    width: 95vw;
+    height: 70vh;
+  }
 }

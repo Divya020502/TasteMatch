@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import dishRoutes from "./routes/dishes.js";
 import placesRoutes from "./routes/places.js";
+import restaurantRoutes from "./routes/restaurants.js";
 
 import errorHandler from "./middlewares/errorHandler.js";
 
@@ -26,6 +27,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/dishes", dishRoutes);
 app.use("/api/places", placesRoutes);
+app.use("/api/restaurants", restaurantRoutes);
 
 // Global Error Handler
 app.use(errorHandler);
