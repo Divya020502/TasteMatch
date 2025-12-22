@@ -18,7 +18,7 @@ const Login = () => {
       login(res.data.token, res.data.user);
       showSuccess("Welcome back");
       navigate("/");
-    } catch (err) {
+    } catch {
       showError("Invalid email or password");
     }
   };

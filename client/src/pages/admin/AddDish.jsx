@@ -39,7 +39,7 @@ const AddDish = () => {
       await addDish(dish);
       showSuccess("Dish added successfully 🍽️");
       navigate("/admin/dishes");
-    } catch (err) {
+    } catch {
       showError("Failed to add dish");
     }
   };

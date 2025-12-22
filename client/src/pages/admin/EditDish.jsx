@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { showSuccess, showError } from "../../utils/toast";
+import { showSuccess } from "../../utils/toast";
 import Navbar from "../../components/layout/Navbar";
 import {
   getDishById,
@@ -37,7 +37,7 @@ const EditDish = () => {
       try {
         const res = await getDishById(id);
         setDish(res.data);
-      } catch (err) {
+      } catch {
         alert("Dish not found");
         navigate("/admin/dishes");
       } finally {
@@ -72,7 +72,7 @@ const EditDish = () => {
       }
 
       navigate("/admin/dishes");
-    } catch (err) {
+    } catch {
       alert("Failed to save dish");
     }
   };

@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 const useFetch = (apiCall, deps = []) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const memoizedDeps = useMemo(() => [apiCall, ...deps], [apiCall, ...deps]);
 
   useEffect(() => {
     let isMounted = true;
@@ -25,7 +27,7 @@ const useFetch = (apiCall, deps = []) => {
     return () => {
       isMounted = false;
     };
-  }, deps);
+  }, memoizedDeps);
 
   return { data, loading, error };
 };
