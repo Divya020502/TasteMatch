@@ -29,6 +29,8 @@ const UserSchema = new mongoose.Schema(
     diet: { type: String, enum: ["veg", "non-veg", "vegan"] },
 
     role: { type: String, enum: ["user", "admin"], default: "user" },
+
+    avatarUrl: String,
   },
   { timestamps: true }
 );

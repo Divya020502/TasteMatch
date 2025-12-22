@@ -16,6 +16,7 @@ const TasteVectorSchema = new mongoose.Schema(
 const DishSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+
     description: String,
 
     tasteVector: {
@@ -35,6 +36,7 @@ const DishSchema = new mongoose.Schema(
     },
 
     imageUrl: String,
+
     keywords: [String], // ramen, spicy, noodles
   },
   { timestamps: true }
