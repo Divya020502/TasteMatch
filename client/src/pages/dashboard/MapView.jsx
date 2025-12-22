@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import DefaultIcon from "../../utils/leafletIcon";
@@ -7,6 +7,7 @@ import { getDistanceKm } from "../../utils/distance";
 import { fetchNearbyRestaurants } from "../../api/overpass";
 import Navbar from "../../components/layout/Navbar";
 import "../../styles/mapView.css";
+import "leaflet/dist/leaflet.css";
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
@@ -16,18 +17,37 @@ const MapView = () => {
   const [position, setPosition] = useState(null);
   const [rankedRestaurants, setRankedRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
+  const mapRef = useRef(null);
 
   // 1️⃣ Get user location
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setPosition([pos.coords.latitude, pos.coords.longitude]);
-      },
-      () => {
-        // fallback location
-        setPosition([17.385, 78.4867]);
-      }
-    );
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          if (isFinite(lat) && isFinite(lng)) {
+            setPosition([lat, lng]);
+          } else {
+            // fallback location
+            setPosition([17.385, 78.4867]);
+          }
+        },
+        (error) => {
+          console.warn("Geolocation error:", error);
+          // fallback location
+          setPosition([17.385, 78.4867]);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000
+        }
+      );
+    } else {
+      // fallback location
+      setPosition([17.385, 78.4867]);
+    }
   }, []);
 
   // 2️⃣ Load restaurants + rank
@@ -106,8 +126,42 @@ const MapView = () => {
     loadAndRank();
   }, [position]);
 
-  if (!position || loading) {
-    return <p>Loading map...</p>;
+  // Handle map resize on mount
+  useEffect(() => {
+    const handleResize = () => {
+      window.dispatchEvent(new Event('resize'));
+      // Invalidate map size after resize
+      if (mapRef.current) {
+        setTimeout(() => {
+          mapRef.current.invalidateSize();
+        }, 100);
+      }
+    };
+
+    // Trigger resize after a short delay to ensure DOM is ready
+    const timer = setTimeout(handleResize, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Invalidate map size when restaurants are loaded
+  useEffect(() => {
+    if (mapRef.current && !loading) {
+      setTimeout(() => {
+        mapRef.current.invalidateSize();
+      }, 100);
+    }
+  }, [loading, rankedRestaurants]);
+
+  if (!position || loading || !Array.isArray(position) || position.length !== 2) {
+    return (
+      <div style={{ height: "80vh", width: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Navbar />
+        <div style={{ textAlign: "center" }}>
+          <h2>🗺️ Loading Map...</h2>
+          <p style={{ color: "#666" }}>Getting your location and finding restaurants...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -118,57 +172,80 @@ const MapView = () => {
         Ranked by your taste preference and distance
       </p>
 
-      <MapContainer
-        center={position}
-        zoom={14}
-        style={{ height: "100%", width: "100%" }}
-      >
-        <TileLayer
-          attribution="&copy; OpenStreetMap contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+      <div style={{ height: "calc(80vh - 120px)", width: "100%" }}>
+        <MapContainer
+          ref={mapRef}
+          key={`${position?.[0]}-${position?.[1]}`} // Force re-render when position changes
+          center={position}
+          zoom={14}
+          style={{ height: "100%", width: "100%" }}
+          zoomControl={true}
+          whenReady={() => {
+            // Map is ready, invalidate size to ensure proper rendering
+            setTimeout(() => {
+              if (mapRef.current) {
+                mapRef.current.invalidateSize();
+              }
+            }, 100);
+          }}
+        >
+          <TileLayer
+            attribution="&copy; OpenStreetMap contributors"
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            errorTileUrl="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+            maxZoom={18}
+            minZoom={10}
+            eventHandlers={{
+              tileerror: (e) => {
+                console.warn('Tile failed to load:', e);
+              }
+            }}
+          />
 
-        {/* 📍 User marker */}
-        <Marker position={position}>
-          <Popup>You are here</Popup>
-        </Marker>
-
-        {/* 🍽️ Restaurant markers */}
-        {rankedRestaurants.map((r) => (
-          <Marker key={r.id} position={[r.lat, r.lng]}>
-            <Popup>
-              <strong>{r.name}</strong>
-              <br />
-              Cuisine: {r.cuisine}
-              <br />
-              🍽️ Taste Match: {(r.tasteScore * 100).toFixed(0)}%
-              <br />
-              📍 Distance: {r.distance} km
-              <br />
-              ⭐ Final Score: {(r.finalScore * 100).toFixed(0)}%
-              <br /><br />
-
-              {/* 🧭 DIRECTIONS BUTTON */}
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "inline-block",
-                  padding: "8px 12px",
-                  backgroundColor: "#2563eb",
-                  color: "#ffffff",
-                  borderRadius: "6px",
-                  textDecoration: "none",
-                  fontWeight: "bold",
-                }}
-              >
-                🧭 Get Directions
-              </a>
-            </Popup>
+          {/* 📍 User marker */}
+          <Marker position={position}>
+            <Popup>You are here</Popup>
           </Marker>
-        ))}
-      </MapContainer>
+
+          {/* 🍽️ Restaurant markers */}
+          {rankedRestaurants
+            .filter(r => r.lat && r.lng && isFinite(r.lat) && isFinite(r.lng))
+            .map((r) => (
+            <Marker key={r.id} position={[r.lat, r.lng]}>
+              <Popup>
+                <strong>{r.name}</strong>
+                <br />
+                Cuisine: {r.cuisine}
+                <br />
+                🍽️ Taste Match: {(r.tasteScore * 100).toFixed(0)}%
+                <br />
+                📍 Distance: {r.distance} km
+                <br />
+                ⭐ Final Score: {(r.finalScore * 100).toFixed(0)}%
+                <br /><br />
+
+                {/* 🧭 DIRECTIONS BUTTON */}
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-block",
+                    padding: "8px 12px",
+                    backgroundColor: "#2563eb",
+                    color: "#ffffff",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    fontWeight: "bold",
+                  }}
+                >
+                  🧭 Get Directions
+                </a>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      </div>
     </div>
   );
 };

@@ -18,6 +18,29 @@
   width: 100%;
 }
 
+/* Ensure Leaflet map renders properly */
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  z-index: 1;
+}
+
+.leaflet-tile-pane {
+  z-index: 2;
+}
+
+.leaflet-marker-pane {
+  z-index: 3;
+}
+
+.leaflet-popup-pane {
+  z-index: 4;
+}
+
+.leaflet-control-container {
+  z-index: 5;
+}
+
 .map-loading {
   display: flex;
   justify-content: center;
