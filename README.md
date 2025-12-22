@@ -5,8 +5,8 @@ TasteMatch is a **taste-based food recommendation platform** that helps users di
 ---
 
 ## 🚀 Live Demo
-- Frontend: https://tastematch.vercel.app
-- Backend API: https://tastematch-api.onrender.com
+- Frontend: https://taste-match-alpha.vercel.app/explore
+- Backend API: https://tastematch-1ujx.onrender.com/
 
 ---
 
@@ -67,5 +67,5 @@ TasteMatch is a **taste-based food recommendation platform** that helps users di
 ## ⚙️ Installation (Local)
 
 ```bash
-git clone https://github.com/your-username/tastematch
-cd tastematch
+git clone https://github.com/Divya020502/TasteMatch.git
+cd TasteMatch
