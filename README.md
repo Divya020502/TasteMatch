@@ -5,7 +5,7 @@ TasteMatch is a **taste-based food recommendation platform** that helps users di
 ---
 
 ## 🚀 Live Demo
-- Frontend: https://taste-match-alpha.vercel.app/explore
+- Frontend: https://taste-match-4d2u6zp3g-divya020502s-projects.vercel.app/login
 - Backend API: https://tastematch-1ujx.onrender.com/
 
 ---
