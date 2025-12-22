@@ -1,139 +1,111 @@
-import { useEffect, useState } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMap,
-} from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-
+import { useEffect, useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
 import Navbar from "../../components/layout/Navbar";
 import { getRestaurants } from "../../api/restaurants";
 import "../../styles/mapView.css";
+import "mapbox-gl/dist/mapbox-gl.css";
 
-/* 🔧 Fix Leaflet default icon issue */
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
-
-/* 🔥 IMPORTANT: Force Leaflet to recalc size */
-const FixMapResize = () => {
-  const map = useMap();
-
-  useEffect(() => {
-    setTimeout(() => {
-      map.invalidateSize();
-    }, 200);
-  }, [map]);
-
-  return null;
-};
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 const MapView = () => {
-  const [position, setPosition] = useState(null);
+  const mapRef = useRef(null);
+  const mapContainerRef = useRef(null);
+
+  const [userLocation, setUserLocation] = useState(null);
   const [restaurants, setRestaurants] = useState([]);
 
   /* 📍 Get user location */
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setPosition([
-          pos.coords.latitude,
+        setUserLocation([
           pos.coords.longitude,
+          pos.coords.latitude,
         ]);
       },
       () => {
         // Vijayawada fallback
-        setPosition([16.5062, 80.6480]);
+        setUserLocation([80.6480, 16.5062]);
       }
     );
   }, []);
 
-  /* 🍽️ Load restaurants from MongoDB */
+  /* 🍽 Load restaurants from DB */
   useEffect(() => {
-    const loadRestaurants = async () => {
-      try {
-        const res = await getRestaurants();
-        setRestaurants(res.data);
-      } catch (err) {
-        console.error("Failed to load restaurants", err);
-      }
+    const load = async () => {
+      const res = await getRestaurants();
+      setRestaurants(res.data);
     };
-    loadRestaurants();
+    load();
   }, []);
 
-  if (!position) {
-    return <p>Loading map...</p>;
-  }
+  /* 🗺 Initialize Mapbox */
+  useEffect(() => {
+    if (!userLocation || mapRef.current) return;
+
+    mapRef.current = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: userLocation,
+      zoom: 13,
+    });
+
+    // Navigation controls
+    mapRef.current.addControl(
+      new mapboxgl.NavigationControl(),
+      "top-right"
+    );
+
+    // User marker
+    new mapboxgl.Marker({ color: "#2563eb" })
+      .setLngLat(userLocation)
+      .setPopup(new mapboxgl.Popup().setText("You are here"))
+      .addTo(mapRef.current);
+
+    // 🔥 Fix resize issue
+    setTimeout(() => {
+      mapRef.current.resize();
+    }, 300);
+  }, [userLocation]);
+
+  /* 📍 Restaurant markers */
+  useEffect(() => {
+    if (!mapRef.current || restaurants.length === 0) return;
+
+    restaurants.forEach((r) => {
+      const popupHtml = `
+        <div style="font-size:14px">
+          <strong>${r.name}</strong><br/>
+          ${r.address || ""}<br/>
+          🍽 ${r.dishes?.join(", ") || ""}<br/><br/>
+          <a
+            href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"
+            target="_blank"
+            style="color:#2563eb;font-weight:bold;text-decoration:none"
+          >
+            🧭 Directions
+          </a>
+        </div>
+      `;
+
+      new mapboxgl.Marker({ color: "#ef4444" })
+        .setLngLat([r.lng, r.lat])
+        .setPopup(new mapboxgl.Popup().setHTML(popupHtml))
+        .addTo(mapRef.current);
+    });
+  }, [restaurants]);
 
   return (
     <>
       <Navbar />
 
       <div className="map-page">
-        <div className="map-title">
+        <div className="map-header">
           <h2>🗺️ Best Restaurants Near You</h2>
           <p>Ranked by your taste preference and distance</p>
         </div>
 
-        <div className="map-container">
-          <MapContainer
-            center={position}
-            zoom={14}
-            style={{ width: "100%", height: "100%" }}
-          >
-            <FixMapResize />
-
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="&copy; OpenStreetMap contributors"
-            />
-
-            {/* 👤 User marker */}
-            <Marker position={position}>
-              <Popup>You are here</Popup>
-            </Marker>
-
-            {/* 🍴 Restaurant markers */}
-            {restaurants.map((r) => (
-              <Marker key={r._id} position={[r.lat, r.lng]}>
-                <Popup>
-                  <strong>{r.name}</strong>
-                  <br />
-                  {r.address}
-                  <br />
-                  🍽 {r.dishes?.join(", ")}
-                  <br />
-                  <br />
-                  <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{
-                      display: "inline-block",
-                      padding: "6px 10px",
-                      background: "#2563eb",
-                      color: "#fff",
-                      borderRadius: "6px",
-                      textDecoration: "none",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    🧭 Directions
-                  </a>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
-        </div>
+        <div className="map-container" ref={mapContainerRef} />
       </div>
     </>
   );

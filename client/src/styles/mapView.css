@@ -5,9 +5,9 @@
   padding: 20px;
 }
 
-.map-title {
+.map-header {
   width: 100%;
-  max-width: 1200px;
+  max-width: 900px;
   margin-bottom: 12px;
 }
 
@@ -15,12 +15,11 @@
   width: 500px;
   height: 700px;
   border-radius: 12px;
-  overflow: hidden; /* 🔥 critical */
-  background: #eaeaea;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;      /* 🔥 critical */
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
-/* Mobile responsive */
+/* mobile */
 @media (max-width: 768px) {
   .map-container {
     width: 95vw;
