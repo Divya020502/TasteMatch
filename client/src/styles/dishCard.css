@@ -1,158 +1,82 @@
 .dish-card {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 20px;
-  width: 280px;
-  box-shadow: var(--shadow);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.2);
-  position: relative;
-  overflow: hidden;
-}
-
-.dish-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,107,53,0.1), transparent);
-  transition: left 0.5s;
-}
-
-.dish-card:hover::before {
-  left: 100%;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .dish-card:hover {
-  transform: translateY(-12px) scale(1.02);
-  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
 }
 
-.dish-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 16px;
-  transition: transform 0.3s ease;
+.dish-card h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  color: #111827;
 }
 
-.dish-card:hover .dish-image {
-  transform: scale(1.05);
+.dish-meta {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 10px;
 }
 
-.dish-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.dish-desc {
+  font-size: 15px;
+  color: #374151;
   margin-bottom: 12px;
 }
 
-.dish-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text);
-  margin: 0;
-  line-height: 1.3;
+.dish-restaurants {
+  margin-bottom: 14px;
 }
 
-.score {
-  background: linear-gradient(135deg, var(--success), #38a169);
-  color: white;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
-  animation: pulse 2s ease-in-out infinite;
+.dish-restaurants ul {
+  padding-left: 18px;
+  margin: 6px 0 0;
+}
+
+.dish-restaurants li {
+  font-size: 14px;
+  color: #374151;
 }
 
 .muted {
-  color: var(--muted);
   font-size: 14px;
-  margin: 8px 0;
+  color: #9ca3af;
+}
+
+.dish-actions {
   display: flex;
-  align-items: center;
-  gap: 4px;
+  gap: 10px;
 }
 
-.taste-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.taste-tag {
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: white;
-  font-size: 11px;
-  font-weight: 500;
-  padding: 4px 8px;
-  border-radius: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-}
-
-.taste-tag:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
-}
-
-.dish-description {
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.5;
-  margin: 8px 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.taste-values {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
-}
-
-.taste-value {
-  text-align: center;
-}
-
-.taste-value span {
-  display: block;
+.dish-actions button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
   font-weight: 600;
-  color: var(--text);
-  font-size: 12px;
+  background: #2563eb;
+  color: #ffffff;
+  transition: background 0.2s ease;
 }
 
-.loading-shimmer {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+.dish-actions button:hover {
+  background: #1e40af;
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+.dish-actions .secondary {
+  background: #f3f4f6;
+  color: #111827;
 }
 
-@media (max-width: 768px) {
-  .dish-card {
-    width: 100%;
-    max-width: 320px;
-  }
-
-  .dish-image {
-    height: 160px;
-  }
+.dish-actions .secondary:hover {
+  background: #e5e7eb;
 }

@@ -38,6 +38,18 @@ const DishSchema = new mongoose.Schema(
     imageUrl: String,
 
     keywords: [String], // ramen, spicy, noodles
+
+    recipe: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Recipe",
+    },
+
+    restaurants: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Restaurant",
+      },
+    ],
   },
   { timestamps: true }
 );

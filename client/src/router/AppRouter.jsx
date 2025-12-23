@@ -11,6 +11,7 @@ import DishManagement from "../pages/admin/DishManagement";
 import EditDish from "../pages/admin/EditDish";
 import AddDish from "../pages/admin/AddDish";
 import MapView from "../pages/dashboard/MapView";
+import RecipePage from "../pages/dashboard/RecipePage";
 
 
 const AppRouter = () => {
@@ -52,6 +53,15 @@ const AppRouter = () => {
           element={
             <PrivateRoute>
               <Explore />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/recipe/:dishName"
+          element={
+            <PrivateRoute>
+              <RecipePage />
             </PrivateRoute>
           }
         />
