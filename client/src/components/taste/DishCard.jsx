@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import "../../styles/DishCard.css";
+import "../../styles/dishCard.css";
 
 const DishCard = ({ dish }) => {
   const navigate = useNavigate();
