@@ -25,7 +25,7 @@ const Explore = () => {
     const loadData = async () => {
       try {
         const [dishRes, restRes] = await Promise.all([
-          getRecommendations(),
+          getRecommendations(filters),
           api.get("/restaurants"),
         ]);
 
@@ -39,7 +39,7 @@ const Explore = () => {
     };
 
     loadData();
-  }, []);
+  }, [filters]);
 
   if (loading) return <p>Loading dishes...</p>;
 

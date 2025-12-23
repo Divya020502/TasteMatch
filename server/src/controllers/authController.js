@@ -62,3 +62,19 @@ export const login = async (req, res, next) => {
     next(error);
   }
 };
+
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // For now, just return success (implement email sending later)
+    res.json({ message: "Password reset link sent to your email" });
+  } catch (error) {
+    next(error);
+  }
+};

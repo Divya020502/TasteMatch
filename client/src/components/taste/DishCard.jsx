@@ -52,7 +52,7 @@ const DishCard = ({ dish }) => {
         onClick={() => {
           console.log("Recipe button clicked, dish._id:", dish._id);
           if (dish._id) {
-            navigate(`/recipes/${encodeURIComponent(dish.name)}`);
+            navigate(`/recipe/${encodeURIComponent(dish.name)}`);
           } else {
             console.error("dish._id is undefined");
           }

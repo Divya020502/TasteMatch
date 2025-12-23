@@ -12,10 +12,10 @@ const RecipePage = () => {
     const fetchRecipe = async () => {
       try {
         const res = await api.get(
-          `/recipes/${encodeURIComponent(dishName)}`
+          `/recipes/dish/${encodeURIComponent(dishName)}`
         );
         setRecipe(res.data);
-      } catch (err) {
+      } catch {
         console.error("Recipe not found");
       } finally {
         setLoading(false);

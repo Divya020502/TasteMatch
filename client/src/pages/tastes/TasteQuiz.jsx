@@ -1,6 +1,7 @@
 import Navbar from "../../components/layout/Navbar";
 import { useContext } from "react";
 import { TasteContext } from "../../context/TasteContext";
+import { CUISINES } from "../../utils/constants";
 import "../../styles/taste.css";
 
 const TasteQuiz = () => {
@@ -54,7 +55,7 @@ const TasteQuiz = () => {
 
         {/* Cuisine Selection */}
         <h3>Select Cuisines</h3>
-        {["Indian", "Japanese", "Chinese", "Italian"].map((c) => (
+        {CUISINES.map((c) => (
           <button
             key={c}
             onClick={() => toggleCuisine(c)}

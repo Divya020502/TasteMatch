@@ -2,10 +2,15 @@ import mongoose from "mongoose";
 
 const RestaurantSchema = new mongoose.Schema({
   name: String,
-  cuisine: String,
+  cuisines: [String],
+  address: String,
   lat: Number,
   lng: Number,
-  address: String
-});
+  menu: [String],
+  dishes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Dish",
+  }],
+}, { timestamps: true });
 
 export default mongoose.model("Restaurant", RestaurantSchema);
