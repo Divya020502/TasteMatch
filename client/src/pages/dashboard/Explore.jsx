@@ -47,17 +47,24 @@ const Explore = () => {
     <>
       <Navbar />
       <div className="explore-page">
-        <RecipeFilters filters={filters} setFilters={setFilters} />
-        <h2>⭐ Best Match For You</h2>
+        <div className="explore-container">
+          <div className="explore-main">
+            <h2>⭐ Best Match For You</h2>
 
-        <div className="dish-grid">
-          {dishes.map((dish) => (
-            <DishCard
-              key={dish._id}
-              dish={dish}
-              restaurants={restaurants}
-            />
-          ))}
+            <div className="dish-grid">
+              {dishes.map((dish) => (
+                <DishCard
+                  key={dish._id}
+                  dish={dish}
+                  restaurants={restaurants}
+                />
+              ))}
+            </div>
+          </div>
+
+          <aside className="explore-sidebar">
+            <RecipeFilters filters={filters} setFilters={setFilters} />
+          </aside>
         </div>
       </div>
     </>
