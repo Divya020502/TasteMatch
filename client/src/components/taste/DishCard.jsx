@@ -1,54 +1,59 @@
 import { useNavigate } from "react-router-dom";
-import "../../styles/dishCard.css";
+import "../../styles/DishCard.css";
 
-const DishCard = ({ dish, restaurants }) => {
+const DishCard = ({ dish }) => {
   const navigate = useNavigate();
-
-  const servingRestaurants = restaurants.filter((r) =>
-    r.menu.includes(dish.name)
-  );
 
   return (
     <div className="dish-card">
-      <h3>{dish.name}</h3>
 
+      {/* Dish name */}
+      <h3 className="dish-name">{dish.name}</h3>
+
+      {/* Cuisine + Diet */}
       <p className="dish-meta">
-        🍽️ {dish.cuisine} | {dish.diet}
+        {dish.cuisine} • {dish.diet === "veg" ? "🥬 Veg" : "🍖 Non-Veg"}
       </p>
 
-      <p className="dish-desc">{dish.description}</p>
+      {/* Taste highlights */}
+      <div className="dish-tastes">
+        {dish.tasteVector.spicy >= 7 && <span>🌶️ Spicy</span>}
+        {dish.tasteVector.umami >= 7 && <span>🍄 Umami-rich</span>}
+        {dish.tasteVector.sweet >= 5 && <span>🍬 Slightly Sweet</span>}
+      </div>
 
+      {/* Description */}
+      <p className="dish-description">
+        {dish.description || "A delicious dish loved by food lovers."}
+      </p>
+
+      {/* Restaurants */}
       <div className="dish-restaurants">
-        <strong>📍 Available at:</strong>
-        {servingRestaurants.length === 0 ? (
-          <p className="muted">No nearby restaurants</p>
-        ) : (
-          <ul>
-            {servingRestaurants.slice(0, 3).map((r) => (
-              <li key={r._id}>{r.name}</li>
-            ))}
-          </ul>
-        )}
+        <div className="restaurants-header">
+          <span>📍 Available Nearby</span>
+          <button
+            className="link-btn"
+            onClick={() => navigate(`/map?dish=${dish._id}`)}
+          >
+            View Restaurants
+          </button>
+        </div>
+
+        <ul>
+          {dish.restaurants?.slice(0, 3).map((r) => (
+            <li key={r._id}>{r.name}</li>
+          ))}
+        </ul>
       </div>
 
-      <div className="dish-actions">
-        <button
-          onClick={() =>
-            navigate(`/restaurants?dish=${encodeURIComponent(dish.name)}`)
-          }
-        >
-          View Restaurants
-        </button>
+      {/* Recipe */}
+      <button
+        className="recipe-btn"
+        onClick={() => navigate(`/dish/${dish._id}`)}
+      >
+        🍳 View Recipe
+      </button>
 
-        <button
-          className="secondary"
-          onClick={() =>
-            navigate(`/recipe/${encodeURIComponent(dish.name)}`)
-          }
-        >
-          View Recipe
-        </button>
-      </div>
     </div>
   );
 };
