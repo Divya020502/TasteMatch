@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import Navbar from "../../components/layout/Navbar";
 import { getRestaurants } from "../../api/restaurants";
+import { getDishById } from "../../api/dish";
 import "../../styles/mapView.css";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -10,9 +12,12 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 const MapView = () => {
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
+  const [searchParams] = useSearchParams();
 
   const [userLocation, setUserLocation] = useState(null);
-  const [restaurants, setRestaurants] = useState([]);
+  const [allRestaurants, setAllRestaurants] = useState([]);
+  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
+  const [dishName, setDishName] = useState(null);
 
   /* 📍 Get user location */
   useEffect(() => {
@@ -33,11 +38,46 @@ const MapView = () => {
   /* 🍽 Load restaurants from DB */
   useEffect(() => {
     const load = async () => {
-      const res = await getRestaurants();
-      setRestaurants(res.data);
+      try {
+        const res = await getRestaurants();
+        setAllRestaurants(res.data);
+      } catch (err) {
+        console.error("Failed to load restaurants:", err);
+      }
     };
     load();
   }, []);
+
+  /* 🍽 Filter restaurants by dish */
+  useEffect(() => {
+    const dishParam = searchParams.get('dish');
+    
+    if (dishParam && allRestaurants.length > 0) {
+      // Fetch dish details to get the name
+      const fetchDishAndFilter = async () => {
+        try {
+          const dishRes = await getDishById(dishParam);
+          const dish = dishRes.data;
+          setDishName(dish.name);
+          
+          // Filter restaurants that have this dish in their menu
+          const filtered = allRestaurants.filter(restaurant => 
+            restaurant.menu && restaurant.menu.some(menuItem => 
+              menuItem.toLowerCase() === dish.name.toLowerCase()
+            )
+          );
+          setFilteredRestaurants(filtered);
+        } catch (err) {
+          console.error("Failed to fetch dish:", err);
+          setFilteredRestaurants(allRestaurants);
+        }
+      };
+      fetchDishAndFilter();
+    } else {
+      setDishName(null);
+      setFilteredRestaurants(allRestaurants);
+    }
+  }, [searchParams, allRestaurants]);
 
   /* 🗺 Initialize Mapbox */
   useEffect(() => {
@@ -70,14 +110,14 @@ const MapView = () => {
 
   /* 📍 Restaurant markers */
   useEffect(() => {
-    if (!mapRef.current || restaurants.length === 0) return;
+    if (!mapRef.current || filteredRestaurants.length === 0) return;
 
-    restaurants.forEach((r) => {
+    filteredRestaurants.forEach((r) => {
       const popupHtml = `
         <div style="font-size:14px">
           <strong>${r.name}</strong><br/>
           ${r.address || ""}<br/>
-          🍽 ${r.dishes?.join(", ") || ""}<br/><br/>
+          🍽 ${r.menu?.join(", ") || ""}<br/><br/>
           <a
             href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"
             target="_blank"
@@ -93,7 +133,7 @@ const MapView = () => {
         .setPopup(new mapboxgl.Popup().setHTML(popupHtml))
         .addTo(mapRef.current);
     });
-  }, [restaurants]);
+  }, [filteredRestaurants]);
 
   return (
     <>
@@ -101,8 +141,8 @@ const MapView = () => {
 
       <div className="map-page">
         <div className="map-header">
-          <h2>🗺️ Best Restaurants Near You</h2>
-          <p>Ranked by your taste preference and distance</p>
+          <h2>🗺️ {dishName ? `Restaurants Serving ${dishName}` : 'Best Restaurants Near You'}</h2>
+          <p>{dishName ? 'Find restaurants that serve this specific dish' : 'Ranked by your taste preference and distance'}</p>
         </div>
 
         <div className="map-container" ref={mapContainerRef} />
