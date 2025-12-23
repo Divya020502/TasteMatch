@@ -49,7 +49,14 @@ const DishCard = ({ dish }) => {
       {/* Recipe */}
       <button
         className="recipe-btn"
-        onClick={() => navigate(`/dish/${dish._id}`)}
+        onClick={() => {
+          console.log("Recipe button clicked, dish._id:", dish._id);
+          if (dish._id) {
+            navigate(`/dish/${dish._id}`);
+          } else {
+            console.error("dish._id is undefined");
+          }
+        }}
       >
         🍳 View Recipe
       </button>
